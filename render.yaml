@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: f1-analytics
+    runtime: python
+    buildCommand: "pip install -r requirements.txt && python load_from_csv.py"
+    startCommand: "gunicorn run:app"
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+    plan: free
