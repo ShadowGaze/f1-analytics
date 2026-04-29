@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Races{% endblock %}
+{% block content %}
+
+<section class="page-header">
+  <div class="container">
+    <h1 class="page-title">Races</h1>
+    <p class="page-sub">{{ pagination.total }} races across all seasons</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <form class="filter-bar" method="get" role="search">
+      <label class="sr-only" for="q">Search</label>
+      <input id="q" class="filter-input" type="search" name="q"
+             value="{{ search }}" placeholder="Search race name…" autocomplete="off">
+      <label class="sr-only" for="season">Season</label>
+      <select id="season" class="filter-select" name="season">
+        <option value="">All Seasons</option>
+        {% for s in seasons %}
+        <option value="{{ s }}" {% if s == selected_season %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary btn-sm" type="submit">Filter</button>
+      {% if search or selected_season %}
+        <a href="{{ url_for('races.index') }}" class="btn btn-ghost btn-sm">Clear</a>
+      {% endif %}
+    </form>
+
+    {% if pagination.items %}
+    <div class="table-wrap">
+      <table class="data-table" aria-label="Races list">
+        <thead>
+          <tr><th>Season</th><th>Rd</th><th>Race Name</th><th>Circuit</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          {% for r in pagination.items %}
+          <tr>
+            <td class="num">{{ r.season }}</td>
+            <td class="num">{{ r.round }}</td>
+            <td>
+              <a href="{{ url_for('races.detail', season=r.season, round_num=r.round) }}"
+                 class="table-link">{{ r.race_name }}</a>
+            </td>
+            <td>
+              {% if r.circuit %}
+                <a href="{{ url_for('circuits.detail', circuit_id=r.circuit_id) }}"
+                   class="table-link">{{ r.circuit.circuit_name }}</a>
+              {% else %}—{% endif %}
+            </td>
+            <td>{{ r.date.strftime('%d %b %Y') if r.date else '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <nav class="pagination" aria-label="Pagination">
+      {% if pagination.has_prev %}
+        <a href="{{ url_for('races.index', page=pagination.prev_num, q=search, season=selected_season) }}"
+           class="page-btn">&larr; Prev</a>
+      {% endif %}
+      <span class="page-info">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+      {% if pagination.has_next %}
+        <a href="{{ url_for('races.index', page=pagination.next_num, q=search, season=selected_season) }}"
+           class="page-btn">Next &rarr;</a>
+      {% endif %}
+    </nav>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">&#127937;</div>
+      <h3>No races found</h3>
+      <a href="{{ url_for('races.index') }}" class="btn btn-primary">Clear filters</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

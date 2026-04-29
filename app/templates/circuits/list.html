@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Circuits{% endblock %}
+{% block content %}
+
+<section class="page-header">
+  <div class="container">
+    <h1 class="page-title">Circuits</h1>
+    <p class="page-sub">{{ pagination.total }} circuits worldwide</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <form class="filter-bar" method="get" role="search">
+      <label class="sr-only" for="q">Search</label>
+      <input id="q" class="filter-input" type="search" name="q"
+             value="{{ search }}" placeholder="Search circuits…" autocomplete="off">
+      <label class="sr-only" for="country">Country</label>
+      <select id="country" class="filter-select" name="country">
+        <option value="">All Countries</option>
+        {% for c in countries %}
+        <option value="{{ c }}" {% if c == country %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary btn-sm" type="submit">Filter</button>
+      {% if search or country %}
+        <a href="{{ url_for('circuits.index') }}" class="btn btn-ghost btn-sm">Clear</a>
+      {% endif %}
+    </form>
+
+    {% if pagination.items %}
+    <div class="table-wrap">
+      <table class="data-table" aria-label="Circuits list">
+        <thead>
+          <tr><th>Circuit</th><th>Location</th><th>Country</th><th>Lat</th><th>Lng</th></tr>
+        </thead>
+        <tbody>
+          {% for c in pagination.items %}
+          <tr>
+            <td>
+              <a href="{{ url_for('circuits.detail', circuit_id=c.circuit_id) }}" class="table-link">
+                {{ c.circuit_name }}
+              </a>
+            </td>
+            <td>{{ c.locality or '—' }}</td>
+            <td>{{ c.country or '—' }}</td>
+            <td class="num">{{ "%.4f"|format(c.lat|float) if c.lat else '—' }}</td>
+            <td class="num">{{ "%.4f"|format(c.lng|float) if c.lng else '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <nav class="pagination" aria-label="Pagination">
+      {% if pagination.has_prev %}
+        <a href="{{ url_for('circuits.index', page=pagination.prev_num, q=search, country=country) }}"
+           class="page-btn">&larr; Prev</a>
+      {% endif %}
+      <span class="page-info">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+      {% if pagination.has_next %}
+        <a href="{{ url_for('circuits.index', page=pagination.next_num, q=search, country=country) }}"
+           class="page-btn">Next &rarr;</a>
+      {% endif %}
+    </nav>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">&#127937;</div>
+      <h3>No circuits found</h3>
+      <a href="{{ url_for('circuits.index') }}" class="btn btn-primary">Clear filters</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

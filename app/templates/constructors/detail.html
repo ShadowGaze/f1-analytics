@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}{{ constructor.name }}{% endblock %}
+{% block content %}
+
+<section class="page-header">
+  <div class="container">
+    <a href="{{ url_for('constructors.index') }}" class="breadcrumb">&larr; Constructors</a>
+    <h1 class="page-title">{{ constructor.name }}</h1>
+    <p class="page-sub">{{ constructor.nationality or '' }}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="detail-grid">
+
+      <div class="panel">
+        <h2 class="panel-title">Career Stats</h2>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-value">{{ career.seasons or 0 }}</span>
+            <span class="kpi-label">Seasons</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-value">{{ career.total_wins or 0 }}</span>
+            <span class="kpi-label">Wins</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-value">{{ career.total_points or 0 }}</span>
+            <span class="kpi-label">Points</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-value">P{{ career.best_finish or '—' }}</span>
+            <span class="kpi-label">Best Pos</span>
+          </div>
+        </div>
+        <dl class="info-list">
+          <div class="info-row"><dt>Name</dt><dd>{{ constructor.name }}</dd></div>
+          <div class="info-row"><dt>Nationality</dt><dd>{{ constructor.nationality or '—' }}</dd></div>
+          {% if constructor.url %}
+          <div class="info-row">
+            <dt>Wikipedia</dt>
+            <dd>
+              <a href="{{ constructor.url }}" target="_blank" rel="noopener noreferrer" class="ext-link">
+                View &rarr;
+              </a>
+            </dd>
+          </div>
+          {% endif %}
+        </dl>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel-title">Season Standings</h2>
+        {% if standings %}
+        <div class="table-wrap">
+          <table class="data-table" aria-label="Constructor season standings">
+            <thead>
+              <tr><th>Season</th><th>Position</th><th>Points</th><th>Wins</th></tr>
+            </thead>
+            <tbody>
+              {% for s in standings %}
+              <tr class="{% if s.position == 1 %}row-champion{% endif %}">
+                <td class="num">{{ s.season }}</td>
+                <td class="num">
+                  {% if s.position == 1 %}
+                    <span class="badge badge-gold">P1 &#9733;</span>
+                  {% else %}
+                    P{{ s.position }}
+                  {% endif %}
+                </td>
+                <td class="num">{{ s.points }}</td>
+                <td class="num">{{ s.wins }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-muted">No standings data available.</p>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

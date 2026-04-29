@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Constructors{% endblock %}
+{% block content %}
+
+<section class="page-header">
+  <div class="container">
+    <h1 class="page-title">Constructors</h1>
+    <p class="page-sub">{{ pagination.total }} constructors in the database</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <form class="filter-bar" method="get" role="search">
+      <label class="sr-only" for="q">Search</label>
+      <input id="q" class="filter-input" type="search" name="q"
+             value="{{ search }}" placeholder="Search constructors…" autocomplete="off">
+      <label class="sr-only" for="nationality">Nationality</label>
+      <select id="nationality" class="filter-select" name="nationality">
+        <option value="">All Nationalities</option>
+        {% for n in nationalities %}
+        <option value="{{ n }}" {% if n == nationality %}selected{% endif %}>{{ n }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary btn-sm" type="submit">Filter</button>
+      {% if search or nationality %}
+        <a href="{{ url_for('constructors.index') }}" class="btn btn-ghost btn-sm">Clear</a>
+      {% endif %}
+    </form>
+
+    {% if pagination.items %}
+    <div class="table-wrap">
+      <table class="data-table" aria-label="Constructors list">
+        <thead>
+          <tr><th>Constructor</th><th>Nationality</th><th>Profile</th></tr>
+        </thead>
+        <tbody>
+          {% for c in pagination.items %}
+          <tr>
+            <td>
+              <a href="{{ url_for('constructors.detail', constructor_id=c.constructor_id) }}"
+                 class="table-link">{{ c.name }}</a>
+            </td>
+            <td>{{ c.nationality or '—' }}</td>
+            <td>
+              {% if c.url %}
+                <a href="{{ c.url }}" target="_blank" rel="noopener noreferrer" class="ext-link">Wiki</a>
+              {% else %}—{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <nav class="pagination" aria-label="Pagination">
+      {% if pagination.has_prev %}
+        <a href="{{ url_for('constructors.index', page=pagination.prev_num, q=search, nationality=nationality) }}"
+           class="page-btn">&larr; Prev</a>
+      {% endif %}
+      <span class="page-info">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+      {% if pagination.has_next %}
+        <a href="{{ url_for('constructors.index', page=pagination.next_num, q=search, nationality=nationality) }}"
+           class="page-btn">Next &rarr;</a>
+      {% endif %}
+    </nav>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">&#128295;</div>
+      <h3>No constructors found</h3>
+      <a href="{{ url_for('constructors.index') }}" class="btn btn-primary">Clear filters</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}F1 Stats{% endblock %} | F1 Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<nav class="navbar" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="{{ url_for('main.index') }}" class="nav-logo" aria-label="F1 Analytics home">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="16" cy="16" r="14" stroke="#E10600" stroke-width="2"/>
+        <path d="M6 20 L11 10 L16 18 L21 8 L26 16"
+              stroke="#E10600" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="16" cy="18" r="2.5" fill="#E10600"/>
+      </svg>
+      <span class="nav-brand">F1 <strong>Analytics</strong></span>
+    </a>
+
+    <ul class="nav-links" role="list">
+      <li><a href="{{ url_for('main.index') }}"
+         class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}">Home</a></li>
+      <li><a href="{{ url_for('drivers.index') }}"
+         class="nav-link {% if request.blueprint == 'drivers' %}active{% endif %}">Drivers</a></li>
+      <li><a href="{{ url_for('constructors.index') }}"
+         class="nav-link {% if request.blueprint == 'constructors' %}active{% endif %}">Constructors</a></li>
+      <li><a href="{{ url_for('circuits.index') }}"
+         class="nav-link {% if request.blueprint == 'circuits' %}active{% endif %}">Circuits</a></li>
+      <li><a href="{{ url_for('races.index') }}"
+         class="nav-link {% if request.blueprint == 'races' %}active{% endif %}">Races</a></li>
+      <li><a href="{{ url_for('analysis.index') }}"
+         class="nav-link nav-link--accent {% if request.blueprint == 'analysis' %}active{% endif %}">Analysis</a></li>
+    </ul>
+  </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container" role="alert">
+      {% for category, message in messages %}
+        <div class="flash flash--{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<main id="main-content">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="footer" role="contentinfo">
+  <div class="footer-inner">
+    <p>F1 Analytics &mdash; Data from
+      <a href="https://api.jolpi.ca/ergast/" target="_blank" rel="noopener noreferrer">Jolpica F1 API</a>
+    </p>
+    <p class="footer-muted">CS551P Advanced Programming &bull; University of Aberdeen</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Formula 1 &bull; Open Data Analytics</p>
+    <h1 class="hero-title">Every Race.<br>Every Driver.<br><span class="text-accent">Every Record.</span></h1>
+    <p class="hero-sub">Complete F1 history — drivers, constructors, circuits and race data from the Jolpica open dataset.</p>
+    <div class="hero-cta">
+      <a href="{{ url_for('analysis.index') }}" class="btn btn-primary">View Analysis</a>
+      <a href="{{ url_for('races.index') }}"    class="btn btn-ghost">Browse Races</a>
+    </div>
+  </div>
+  <div class="hero-strip" aria-hidden="true"></div>
+</section>
+
+<section class="stats-bar" aria-label="Database statistics">
+  <div class="stats-bar-inner">
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.drivers }}</span>
+      <span class="stat-label">Drivers</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.races }}</span>
+      <span class="stat-label">Races</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.circuits }}</span>
+      <span class="stat-label">Circuits</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.constructors }}</span>
+      <span class="stat-label">Constructors</span>
+    </div>
+  </div>
+</section>
+
+{% if champion %}
+<section class="champion-banner">
+  <div class="container">
+    <div class="champion-inner">
+      <div>
+        <p class="champion-eyebrow">{{ latest_season }} World Champion</p>
+        <p class="champion-name">{{ champion.driver.full_name }}</p>
+        <p class="champion-meta">
+          {{ champion.points }} pts &bull; {{ champion.wins }} wins &bull; {{ champion.constructor }}
+        </p>
+      </div>
+      <div class="champion-number" aria-hidden="true">#1</div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section">
+  <div class="container">
+    <div class="home-grid">
+
+      <div class="panel">
+        <h2 class="panel-title">All-Time Leaders</h2>
+        <table class="data-table" aria-label="Top drivers by wins">
+          <thead>
+            <tr><th>#</th><th>Driver</th><th>Wins</th><th>Points</th></tr>
+          </thead>
+          <tbody>
+            {% for d in top_drivers %}
+            <tr>
+              <td class="rank">{{ loop.index }}</td>
+              <td>
+                <a href="{{ url_for('drivers.detail', driver_id=d.driver_id) }}" class="table-link">
+                  {{ d.given_name }} {{ d.family_name }}
+                </a>
+              </td>
+              <td class="num">{{ d.total_wins or 0 }}</td>
+              <td class="num">{{ d.total_points or 0 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <a href="{{ url_for('drivers.index') }}" class="panel-link">All Drivers &rarr;</a>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel-title">Recent Races</h2>
+        <ul class="race-list" role="list">
+          {% for race in recent_races %}
+          <li class="race-item">
+            <a href="{{ url_for('races.detail', season=race.season, round_num=race.round) }}" class="race-item-link">
+              <div class="race-item-meta">
+                <span class="race-season">{{ race.season }}</span>
+                <span class="race-round">Rd {{ race.round }}</span>
+              </div>
+              <div class="race-item-name">{{ race.race_name }}</div>
+              {% if race.circuit %}
+              <div class="race-item-loc">{{ race.circuit.locality }}, {{ race.circuit.country }}</div>
+              {% endif %}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+        <a href="{{ url_for('races.index') }}" class="panel-link">All Races &rarr;</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

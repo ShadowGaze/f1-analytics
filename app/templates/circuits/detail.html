@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}{{ circuit.circuit_name }}{% endblock %}
+{% block content %}
+
+<section class="page-header">
+  <div class="container">
+    <a href="{{ url_for('circuits.index') }}" class="breadcrumb">&larr; Circuits</a>
+    <h1 class="page-title">{{ circuit.circuit_name }}</h1>
+    <p class="page-sub">{{ circuit.locality }}, {{ circuit.country }}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="detail-grid">
+
+      <div class="panel">
+        <h2 class="panel-title">Circuit Info</h2>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-value">{{ total_races }}</span>
+            <span class="kpi-label">Races Held</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-value">{{ seasons_held }}</span>
+            <span class="kpi-label">Seasons</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-value">{{ first_race.season if first_race else '—' }}</span>
+            <span class="kpi-label">First Race</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-value">{{ latest_race.season if latest_race else '—' }}</span>
+            <span class="kpi-label">Latest Race</span>
+          </div>
+        </div>
+        <dl class="info-list">
+          <div class="info-row">
+            <dt>Location</dt>
+            <dd>{{ circuit.locality }}, {{ circuit.country }}</dd>
+          </div>
+          <div class="info-row">
+            <dt>Coordinates</dt>
+            <dd>{{ "%.4f"|format(circuit.lat|float) }}, {{ "%.4f"|format(circuit.lng|float) }}</dd>
+          </div>
+          {% if circuit.url %}
+          <div class="info-row">
+            <dt>Wikipedia</dt>
+            <dd>
+              <a href="{{ circuit.url }}" target="_blank" rel="noopener noreferrer" class="ext-link">
+                View &rarr;
+              </a>
+            </dd>
+          </div>
+          {% endif %}
+        </dl>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel-title">Race History</h2>
+        {% if races %}
+        <div class="table-wrap">
+          <table class="data-table" aria-label="Race history at circuit">
+            <thead>
+              <tr><th>Season</th><th>Round</th><th>Race Name</th><th>Date</th></tr>
+            </thead>
+            <tbody>
+              {% for r in races %}
+              <tr>
+                <td class="num">{{ r.season }}</td>
+                <td class="num">{{ r.round }}</td>
+                <td>
+                  <a href="{{ url_for('races.detail', season=r.season, round_num=r.round) }}"
+                     class="table-link">{{ r.race_name }}</a>
+                </td>
+                <td>{{ r.date.strftime('%d %b %Y') if r.date else '—' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-muted">No race history available.</p>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

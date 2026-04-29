@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}Analysis{% endblock %}
+{% block content %}
+
+<section class="page-header">
+  <div class="container">
+    <h1 class="page-title">F1 Data Analysis</h1>
+    <p class="page-sub">Charts and statistics — rendered server-side with Matplotlib</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <!-- Season selector — plain HTML form, no JS -->
+    <form class="filter-bar" method="get" style="margin-bottom: var(--space-8)">
+      <label for="season" style="color:var(--color-text-muted);font-size:var(--text-sm);font-weight:600">
+        Select Season:
+      </label>
+      <select id="season" class="filter-select" name="season">
+        {% for s in seasons %}
+        <option value="{{ s }}" {% if s == selected_season %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary btn-sm" type="submit">Update Charts</button>
+    </form>
+
+    <!-- ROW 1: All-time wins + Races per season -->
+    <div class="chart-grid-2">
+      <div class="panel">
+        <h2 class="panel-title">Top 10 Drivers — All-Time Wins</h2>
+        <div class="chart-wrap">
+          <img src="{{ url_for('analysis.chart_wins') }}"
+               alt="Horizontal bar chart showing top 10 drivers by all-time race wins"
+               width="900" height="450" loading="lazy" class="chart-img">
+        </div>
+      </div>
+      <div class="panel">
+        <h2 class="panel-title">Races Per Season</h2>
+        <div class="chart-wrap">
+          <img src="{{ url_for('analysis.chart_races_per_season') }}"
+               alt="Line chart showing number of races per F1 season"
+               width="900" height="400" loading="lazy" class="chart-img">
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2: Nationality pies -->
+    <div class="chart-grid-2" style="margin-top: var(--space-6)">
+      <div class="panel">
+        <h2 class="panel-title">Driver Nationalities (Top 10)</h2>
+        <div class="chart-wrap">
+          <img src="{{ url_for('analysis.chart_driver_nationalities') }}"
+               alt="Pie chart of top 10 driver nationalities"
+               width="800" height="500" loading="lazy" class="chart-img">
+        </div>
+      </div>
+      <div class="panel">
+        <h2 class="panel-title">Constructor Nationalities</h2>
+        <div class="chart-wrap">
+          <img src="{{ url_for('analysis.chart_constructor_nationalities') }}"
+               alt="Pie chart of constructor nationalities"
+               width="800" height="500" loading="lazy" class="chart-img">
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 3: Season-specific charts -->
+    {% if selected_season %}
+    <div class="chart-grid-2" style="margin-top: var(--space-6)">
+      <div class="panel">
+        <h2 class="panel-title">{{ selected_season }} Driver Championship</h2>
+        <div class="chart-wrap">
+          <img src="{{ url_for('analysis.chart_season_drivers', season=selected_season) }}"
+               alt="Bar chart of {{ selected_season }} driver championship standings"
+               width="1000" height="450" loading="lazy" class="chart-img">
+        </div>
+      </div>
+      <div class="panel">
+        <h2 class="panel-title">{{ selected_season }} Constructor Championship</h2>
+        <div class="chart-wrap">
+          <img src="{{ url_for('analysis.chart_season_constructors', season=selected_season) }}"
+               alt="Bar chart of {{ selected_season }} constructor championship standings"
+               width="900" height="450" loading="lazy" class="chart-img">
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ROW 4: Multi-line constructor history -->
+    <div class="panel" style="margin-top: var(--space-6)">
+      <h2 class="panel-title">Top 5 Constructors — Points History</h2>
+      <div class="chart-wrap">
+        <img src="{{ url_for('analysis.chart_top_constructors') }}"
+             alt="Multi-line chart showing points per season for top 5 constructors"
+             width="1100" height="500" loading="lazy" class="chart-img">
+      </div>
+    </div>
+
+    <!-- Season standings tables -->
+    {% if season_driver_standings %}
+    <div class="chart-grid-2" style="margin-top: var(--space-6)">
+
+      <div class="panel">
+        <h2 class="panel-title">{{ selected_season }} Driver Standings</h2>
+        <div class="table-wrap">
+          <table class="data-table" aria-label="{{ selected_season }} driver standings">
+            <thead>
+              <tr><th>Pos</th><th>Driver</th><th>Points</th><th>Wins</th></tr>
+            </thead>
+            <tbody>
+              {% for s in season_driver_standings %}
+              <tr class="{% if s.position == 1 %}row-champion{% endif %}">
+                <td class="num">
+                  {% if s.position == 1 %}
+                    <span class="badge badge-gold">P1 &#9733;</span>
+                  {% else %}P{{ s.position }}{% endif %}
+                </td>
+                <td>{{ s.name }}</td>
+                <td class="num">{{ s.points }}</td>
+                <td class="num">{{ s.wins }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel-title">{{ selected_season }} Constructor Standings</h2>
+        <div class="table-wrap">
+          <table class="data-table" aria-label="{{ selected_season }} constructor standings">
+            <thead>
+              <tr><th>Pos</th><th>Constructor</th><th>Points</th><th>Wins</th></tr>
+            </thead>
+            <tbody>
+              {% for s in season_constructor_standings %}
+              <tr class="{% if s.position == 1 %}row-champion{% endif %}">
+                <td class="num">
+                  {% if s.position == 1 %}
+                    <span class="badge badge-gold">P1 &#9733;</span>
+                  {% else %}P{{ s.position }}{% endif %}
+                </td>
+                <td>{{ s.name }}</td>
+                <td class="num">{{ s.points }}</td>
+                <td class="num">{{ s.wins }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

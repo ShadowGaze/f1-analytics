@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}{{ driver.full_name }}{% endblock %}
+{% block content %}
+
+<section class="page-header">
+  <div class="container">
+    <a href="{{ url_for('drivers.index') }}" class="breadcrumb">&larr; All Drivers</a>
+    <div class="detail-header">
+      {% if driver.code %}
+        <div class="detail-code">{{ driver.code }}</div>
+      {% endif %}
+      <div>
+        <h1 class="page-title">{{ driver.full_name }}</h1>
+        <p class="page-sub">
+          {{ driver.nationality or '' }}
+          {% if driver.number %}&bull; #{{ driver.number }}{% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="detail-grid">
+
+      <!-- LEFT: Career summary -->
+      <div class="panel">
+        <h2 class="panel-title">Career Stats</h2>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-value">{{ career.seasons or 0 }}</span>
+            <span class="kpi-label">Seasons</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-value">{{ career.total_wins or 0 }}</span>
+            <span class="kpi-label">Wins</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-value">{{ career.total_points or 0 }}</span>
+            <span class="kpi-label">Points</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-value">
+              {% if career.best_finish %}P{{ career.best_finish }}{% else %}—{% endif %}
+            </span>
+            <span class="kpi-label">Best Pos</span>
+          </div>
+        </div>
+
+        <dl class="info-list">
+          <div class="info-row">
+            <dt>Full Name</dt>
+            <dd>{{ driver.full_name }}</dd>
+          </div>
+          <div class="info-row">
+            <dt>Date of Birth</dt>
+            <dd>
+              {% if driver.dob %}
+                {{ driver.dob.strftime('%d %B %Y') }}
+              {% else %}—{% endif %}
+            </dd>
+          </div>
+          <div class="info-row">
+            <dt>Nationality</dt>
+            <dd>{{ driver.nationality or '—' }}</dd>
+          </div>
+          <div class="info-row">
+            <dt>Driver #</dt>
+            <dd>{{ driver.number or '—' }}</dd>
+          </div>
+          {% if best_season %}
+          <div class="info-row">
+            <dt>Best Season</dt>
+            <dd>
+              {{ best_season.season }} —
+              {{ best_season.points }} pts
+              (P{{ best_season.position }})
+              {% if best_season.constructor %}
+                &bull; {{ best_season.constructor }}
+              {% endif %}
+            </dd>
+          </div>
+          {% endif %}
+          {% if driver.url %}
+          <div class="info-row">
+            <dt>Wikipedia</dt>
+            <dd>
+              <a href="{{ driver.url }}"
+                 target="_blank" rel="noopener noreferrer"
+                 class="ext-link">View profile &rarr;</a>
+            </dd>
+          </div>
+          {% endif %}
+        </dl>
+
+        {% if similar %}
+        <div style="margin-top: var(--space-6)">
+          <p style="font-size:var(--text-xs);font-weight:700;
+                    letter-spacing:0.08em;text-transform:uppercase;
+                    color:var(--color-text-muted);margin-bottom:var(--space-3)">
+            Other {{ driver.nationality }} Drivers
+          </p>
+          <div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">
+            {% for s in similar %}
+              <a href="{{ url_for('drivers.detail', driver_id=s.driver_id) }}"
+                 class="badge" style="text-decoration:none;padding:4px 10px">
+                {{ s.full_name }}
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- RIGHT: Season by season -->
+      <div class="panel">
+        <h2 class="panel-title">Season-by-Season</h2>
+
+        {% if standings %}
+        <div class="table-wrap">
+          <table class="data-table" aria-label="Driver season standings">
+            <thead>
+              <tr>
+                <th>Season</th>
+                <th>Constructor</th>
+                <th>Pos</th>
+                <th>Points</th>
+                <th>Wins</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in standings %}
+              <tr class="{% if s.position == 1 %}row-champion{% endif %}">
+                <td class="num">{{ s.season }}</td>
+                <td>{{ s.constructor or '—' }}</td>
+                <td class="num">
+                  {% if s.position == 1 %}
+                    <span class="badge badge-gold">P1 &#9733;</span>
+                  {% else %}
+                    P{{ s.position }}
+                  {% endif %}
+                </td>
+                <td class="num">{{ s.points or 0 }}</td>
+                <td class="num">{{ s.wins or 0 }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <p class="text-muted">No standings data available for this driver.</p>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

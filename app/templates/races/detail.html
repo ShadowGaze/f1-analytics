@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}{{ race.race_name }} {{ race.season }}{% endblock %}
+{% block content %}
+
+<section class="page-header">
+  <div class="container">
+    <a href="{{ url_for('races.index') }}" class="breadcrumb">&larr; Races</a>
+    <div class="detail-header">
+      <div class="detail-code">R{{ race.round }}</div>
+      <div>
+        <h1 class="page-title">{{ race.race_name }}</h1>
+        <p class="page-sub">{{ race.season }} Season</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="detail-grid">
+
+      <div class="panel">
+        <h2 class="panel-title">Race Details</h2>
+        <dl class="info-list">
+          <div class="info-row"><dt>Season</dt><dd>{{ race.season }}</dd></div>
+          <div class="info-row"><dt>Round</dt><dd>{{ race.round }} of {{ season_races|length }}</dd></div>
+          <div class="info-row">
+            <dt>Date</dt>
+            <dd>{{ race.date.strftime('%d %B %Y') if race.date else '—' }}</dd>
+          </div>
+          <div class="info-row">
+            <dt>Time</dt>
+            <dd>{{ race.time.strftime('%H:%M UTC') if race.time else '—' }}</dd>
+          </div>
+          {% if race.circuit %}
+          <div class="info-row">
+            <dt>Circuit</dt>
+            <dd>
+              <a href="{{ url_for('circuits.detail', circuit_id=race.circuit_id) }}" class="table-link">
+                {{ race.circuit.circuit_name }}
+              </a>
+            </dd>
+          </div>
+          <div class="info-row">
+            <dt>Location</dt>
+            <dd>{{ race.circuit.locality }}, {{ race.circuit.country }}</dd>
+          </div>
+          {% endif %}
+          {% if race.url %}
+          <div class="info-row">
+            <dt>Wikipedia</dt>
+            <dd>
+              <a href="{{ race.url }}" target="_blank" rel="noopener noreferrer" class="ext-link">
+                View &rarr;
+              </a>
+            </dd>
+          </div>
+          {% endif %}
+        </dl>
+
+        <div class="race-nav">
+          {% if prev_race %}
+          <a href="{{ url_for('races.detail', season=prev_race.season, round_num=prev_race.round) }}"
+             class="btn btn-ghost btn-sm">&larr; {{ prev_race.race_name }}</a>
+          {% endif %}
+          {% if next_race %}
+          <a href="{{ url_for('races.detail', season=next_race.season, round_num=next_race.round) }}"
+             class="btn btn-ghost btn-sm">{{ next_race.race_name }} &rarr;</a>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel-title">{{ race.season }} Calendar</h2>
+        <ul class="race-list" role="list">
+          {% for r in season_races %}
+          <li class="race-item {% if r.round == race.round %}race-item--active{% endif %}">
+            <a href="{{ url_for('races.detail', season=r.season, round_num=r.round) }}"
+               class="race-item-link">
+              <div class="race-item-meta">
+                <span class="race-round">Rd {{ r.round }}</span>
+              </div>
+              <div class="race-item-name">{{ r.race_name }}</div>
+              {% if r.date %}
+              <div class="race-item-loc">{{ r.date.strftime('%d %b') }}</div>
+              {% endif %}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

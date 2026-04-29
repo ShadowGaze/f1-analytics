@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Drivers{% endblock %}
+{% block content %}
+
+<section class="page-header">
+  <div class="container">
+    <h1 class="page-title">Drivers</h1>
+    <p class="page-sub">{{ pagination.total }} drivers in the database</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <form class="filter-bar" method="get" role="search">
+      <label class="sr-only" for="q">Search drivers</label>
+      <input
+        id="q"
+        class="filter-input"
+        type="search"
+        name="q"
+        value="{{ search }}"
+        placeholder="Search by name…"
+        autocomplete="off"
+      >
+      <label class="sr-only" for="nationality">Nationality</label>
+      <select id="nationality" class="filter-select" name="nationality">
+        <option value="">All Nationalities</option>
+        {% for n in nationalities %}
+          <option value="{{ n }}" {% if n == nationality %}selected{% endif %}>
+            {{ n }}
+          </option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary btn-sm" type="submit">Filter</button>
+      {% if search or nationality %}
+        <a href="{{ url_for('drivers.index') }}" class="btn btn-ghost btn-sm">Clear</a>
+      {% endif %}
+    </form>
+
+    {% if pagination.items %}
+
+      <div class="table-wrap">
+        <table class="data-table" aria-label="Drivers list">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Driver</th>
+              <th>Nationality</th>
+              <th>Date of Birth</th>
+              <th>#</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in pagination.items %}
+            <tr>
+              <td>
+                {% if d.code %}
+                  <span class="badge">{{ d.code }}</span>
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{{ url_for('drivers.detail', driver_id=d.driver_id) }}"
+                   class="table-link">
+                  {{ d.full_name }}
+                </a>
+              </td>
+              <td>{{ d.nationality or '—' }}</td>
+              <td>
+                {% if d.dob %}
+                  {{ d.dob.strftime('%d %b %Y') }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td class="num">{{ d.number or '—' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if pagination.pages > 1 %}
+      <nav class="pagination" aria-label="Pagination">
+        {% if pagination.has_prev %}
+          <a href="{{ url_for('drivers.index',
+                      page=pagination.prev_num,
+                      q=search,
+                      nationality=nationality) }}"
+             class="page-btn">&larr; Prev</a>
+        {% endif %}
+
+        <span class="page-info">
+          Page {{ pagination.page }} of {{ pagination.pages }}
+          &nbsp;&bull;&nbsp;
+          {{ pagination.total }} drivers
+        </span>
+
+        {% if pagination.has_next %}
+          <a href="{{ url_for('drivers.index',
+                      page=pagination.next_num,
+                      q=search,
+                      nationality=nationality) }}"
+             class="page-btn">Next &rarr;</a>
+        {% endif %}
+      </nav>
+      {% endif %}
+
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon" aria-hidden="true">&#127950;</div>
+        <h3>No drivers found</h3>
+        <p>Try adjusting your search or filter.</p>
+        <a href="{{ url_for('drivers.index') }}" class="btn btn-primary">
+          Clear filters
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}
